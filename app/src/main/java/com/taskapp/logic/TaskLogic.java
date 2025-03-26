@@ -1,10 +1,13 @@
 package com.taskapp.logic;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.taskapp.dataaccess.LogDataAccess;
 import com.taskapp.dataaccess.TaskDataAccess;
 import com.taskapp.dataaccess.UserDataAccess;
+import com.taskapp.exception.AppException;
+import com.taskapp.model.Log;
 import com.taskapp.model.Task;
 import com.taskapp.model.User;
 
@@ -58,36 +61,13 @@ public class TaskLogic {
             if (task.getStatus() == 0) {
                 statusString = "未着手";
             } else if (task.getStatus() == 1) {
-                statusString = "着手";
+                statusString = "着手中";
             } else {
                 statusString = "完了";
             }
 
             System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：" + statusString);
         }
-
-        // tasks.forEach(task -> {
-        //     //担当者コード取得
-        //     int repUserCode = task.getRepUser().getCode();
-        //     User repUser = userDataAccess.findByCode(repUserCode);
-
-        //     String repUserName;
-        //     if (repUser.equals(loginUser)){
-        //         repUserName = "あなた";
-        //     } else {
-        //         repUserName = repUser.getName() ;
-        //     }
-
-
-        //     if (task.getStatus() == 0){
-        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：未着手");
-        //     } else if (task.getStatus() == 1) {
-        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：着手");
-        //     } else {
-        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, 完了");
-        //     }
-
-        // });
     }
 
     /**
@@ -102,9 +82,22 @@ public class TaskLogic {
      * @param loginUser ログインユーザー
      * @throws AppException ユーザーコードが存在しない場合にスローされます
      */
-    // public void save(int code, String name, int repUserCode,
-    //                 User loginUser) throws AppException {
-    // }
+    public void save(int code, String name, int repUserCode,
+                    User loginUser) throws AppException {
+
+        if (repUserCode != 1 && repUserCode != 2) {
+            throw new AppException("存在するユーザーコードを入力してください");
+        }
+
+        Task task = new Task(code, name, repUserCode, loginUser);
+        taskDataAccess.save(task);
+
+        System.out.println(task.getName() + "の登録が完了しました。");
+
+        //log.csvの登録
+        Log log = new Log(code, loginUser.getCode(), 0, LocalDate.now());
+        logDataAccess.save(log);
+    }
 
     /**
      * タスクのステータスを変更します。
@@ -117,9 +110,30 @@ public class TaskLogic {
      * @param loginUser ログインユーザー
      * @throws AppException タスクコードが存在しない、またはステータスが前のステータスより1つ先でない場合にスローされます
      */
-    // public void changeStatus(int code, int status,
-    //                         User loginUser) throws AppException {
-    // }
+    public void changeStatus(int code, int status,
+                            User loginUser) throws AppException {
+        Task task = taskDataAccess.findByCode(code);
+
+        //登録されているか判定
+        if (task == null) {
+            throw new AppException("存在するタスクコードを入力してください");
+        }
+
+        //一つ先のもののみ選択できる
+        if (!(code == (task.getStatus() + 1))) {
+            throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+        }
+
+        //DVDのrentUserCodeをログインユーザーのコードに上書き
+        task.setStatus(task.getStatus() + 1);
+        taskDataAccess.update(task);
+
+        Log log = new Log(task.getCode(), loginUser.getCode(), task.getStatus() + 1, LocalDate.now());
+        //Logs.csvにデータを一件新規登録する
+        logDataAccess.save(log);
+
+        System.out.println("ステータスの変更が完了しました。");
+    }
 
     /**
      * タスクを削除します。

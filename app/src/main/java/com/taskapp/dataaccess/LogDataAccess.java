@@ -1,5 +1,11 @@
 package com.taskapp.dataaccess;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.taskapp.model.Log;
+
 public class LogDataAccess {
     private final String filePath;
 
@@ -21,13 +27,15 @@ public class LogDataAccess {
      *
      * @param log 保存するログ
      */
-    // public void save(Log log) {
-    //     try () {
-
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public void save(Log log) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            String line = createLine(log);
+            writer.newLine();
+            writer.write(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * すべてのログを取得します。
@@ -63,7 +71,9 @@ public class LogDataAccess {
      * @param log フォーマットを作成するログ
      * @return CSVファイルに書き込むためのフォーマット
      */
-    // private String createLine(Log log) {
-    // }
+    private String createLine(Log log) {
+        return log.getTaskCode() + "," + log.getChangeUserCode() + "," +
+                log.getStatus() + "," + log.getChangeDate();
+    }
 
 }

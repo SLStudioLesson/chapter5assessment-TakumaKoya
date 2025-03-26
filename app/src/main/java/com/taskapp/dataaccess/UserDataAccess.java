@@ -73,7 +73,7 @@ public class UserDataAccess {
                 String password = values[3];
 
                 // Libraryオブジェクトにマッピングしていく
-                user = new User(code, name, email, password);
+                user = new User(userCode, name, email, password);
                 break;
             }
         } catch (IOException e) {
