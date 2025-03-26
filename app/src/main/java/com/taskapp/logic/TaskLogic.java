@@ -1,8 +1,12 @@
 package com.taskapp.logic;
 
+import java.util.List;
+
 import com.taskapp.dataaccess.LogDataAccess;
 import com.taskapp.dataaccess.TaskDataAccess;
 import com.taskapp.dataaccess.UserDataAccess;
+import com.taskapp.model.Task;
+import com.taskapp.model.User;
 
 public class TaskLogic {
     private final TaskDataAccess taskDataAccess;
@@ -34,8 +38,57 @@ public class TaskLogic {
      * @see com.taskapp.dataaccess.TaskDataAccess#findAll()
      * @param loginUser ログインユーザー
      */
-    // public void showAll(User loginUser) {
-    // }
+    public void showAll(User loginUser) {
+        List<Task> tasks = taskDataAccess.findAll();
+
+        for (Task task : tasks) {
+            int repUserCode = task.getRepUser().getCode();
+            User repUser = userDataAccess.findByCode(repUserCode);
+
+            //担当者判定
+            String repUserName;
+            if (repUser.equals(loginUser)) {
+                repUserName = "あなた";
+            } else {
+                repUserName = repUser.getName();
+            }
+
+            //ステータス判定
+            String statusString;
+            if (task.getStatus() == 0) {
+                statusString = "未着手";
+            } else if (task.getStatus() == 1) {
+                statusString = "着手";
+            } else {
+                statusString = "完了";
+            }
+
+            System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：" + statusString);
+        }
+
+        // tasks.forEach(task -> {
+        //     //担当者コード取得
+        //     int repUserCode = task.getRepUser().getCode();
+        //     User repUser = userDataAccess.findByCode(repUserCode);
+
+        //     String repUserName;
+        //     if (repUser.equals(loginUser)){
+        //         repUserName = "あなた";
+        //     } else {
+        //         repUserName = repUser.getName() ;
+        //     }
+
+
+        //     if (task.getStatus() == 0){
+        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：未着手");
+        //     } else if (task.getStatus() == 1) {
+        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, ステータス：着手");
+        //     } else {
+        //         System.out.println(task.getCode() + ". タスク名：" + task.getName() + ", 担当者名：" + repUserName + "が担当しています, 完了");
+        //     }
+
+        // });
+    }
 
     /**
      * 新しいタスクを保存します。
