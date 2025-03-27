@@ -100,7 +100,6 @@ public class TaskUI {
 
                 // ログイン処理を呼び出す
                 loginUser = userLogic.login(email, password);
-                System.out.println();
                 flg = false;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -129,7 +128,7 @@ public class TaskUI {
                     continue;
                 }
 
-                System.out.print("タスク名を入力してください：：");
+                System.out.print("タスク名を入力してください：");
                 String name = reader.readLine();
                 if (!(name.length() <= 10)) {
                     System.out.println("タスク名は10文字以内で入力してください");
@@ -216,12 +215,12 @@ public class TaskUI {
                 System.out.print("選択肢：");
                 String status = reader.readLine();
                 if (!isNumeric(status)) {
-                    System.out.println("コードは半角の数字で入力してください");
+                    System.out.println("ステータスは半角の数字で入力してください");
                     System.out.println();
                     continue;
                 }
 
-                if (!(status.equals("1") && status.equals("2"))) {
+                if (!(status.equals("1") || status.equals("2"))) {
                     System.out.println("ステータスは1・2の中から選択してください");
                     System.out.println();
                     continue;

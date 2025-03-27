@@ -70,7 +70,6 @@ public class TaskDataAccess {
      */
     public void save(Task task) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            System.out.println(task.getRepUser());
             String line = createLine(task);
 
             writer.newLine();
@@ -161,6 +160,6 @@ public class TaskDataAccess {
      * @return CSVに書き込むためのフォーマット文字列
      */
     private String createLine(Task task) {
-        return task.getCode() + "," + task.getName() + "," + 0 + "," + task.getStatus();
+        return task.getCode() + "," + task.getName() + "," + task.getStatus() + "," + task.getRepUser().getCode();
     }
 }

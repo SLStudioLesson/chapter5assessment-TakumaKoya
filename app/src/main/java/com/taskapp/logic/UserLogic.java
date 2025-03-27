@@ -36,8 +36,6 @@ public class UserLogic {
             throw new AppException("既に登録されているメールアドレス、パスワードを入力してください");
         }
 
-        System.out.println("ユーザー名：" + user.getName() + "でログインしました。");
         return user;
-
     }
 }

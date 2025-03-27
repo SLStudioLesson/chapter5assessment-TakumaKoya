@@ -66,7 +66,7 @@ public class UserDataAccess {
 
                 int userCode = Integer.parseInt(values[0]);
 
-                if(userCode == code) continue;
+                if(userCode != code) continue;
                 
                 String name = values[1];
                 String email = values[2];

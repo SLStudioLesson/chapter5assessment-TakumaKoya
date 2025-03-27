@@ -89,7 +89,10 @@ public class TaskLogic {
             throw new AppException("存在するユーザーコードを入力してください");
         }
 
-        Task task = new Task(code, name, repUserCode, loginUser);
+        //担当するユーザーオブジェクトの取得
+        User repUser = userDataAccess.findByCode(repUserCode);
+
+        Task task = new Task(code, name, 0, repUser);
         taskDataAccess.save(task);
 
         System.out.println(task.getName() + "の登録が完了しました。");
@@ -120,15 +123,16 @@ public class TaskLogic {
         }
 
         //一つ先のもののみ選択できる
-        if (!(code == (task.getStatus() + 1))) {
+        int statusPlusOne = task.getStatus() + 1;
+        
+        if ((status != statusPlusOne)) {
             throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
         }
 
-        //DVDのrentUserCodeをログインユーザーのコードに上書き
-        task.setStatus(task.getStatus() + 1);
+        task.setStatus(status);
         taskDataAccess.update(task);
 
-        Log log = new Log(task.getCode(), loginUser.getCode(), task.getStatus() + 1, LocalDate.now());
+        Log log = new Log(task.getCode(), loginUser.getCode(), task.getStatus(), LocalDate.now());
         //Logs.csvにデータを一件新規登録する
         logDataAccess.save(log);
 
